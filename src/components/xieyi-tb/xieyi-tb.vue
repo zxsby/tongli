@@ -243,7 +243,7 @@
       TcpOk () {
         var str = ''
         for (var i in this.selectTcp) {
-          str += i + '&'
+          str += this.selectTcp[i] + '&'
         }
         this.$http.get(`../cgi-bin/modtcp_modify.cgi?${str}`).then((response) => {
           if (response.data.result === 'true') {
@@ -262,8 +262,9 @@
       },
       RtuOk () {
         var str = ''
-        for (var i in this.selectTcp) {
-          str += i + '&'
+        for (var i in this.selectRtu) {
+          str += this.selectRtu[i] + '&'
+
         }
         this.$http.get(`../cgi-bin/modrtu_modify.cgi?${str}`).then((response) => {
           if (response.data.result === 'true') {
