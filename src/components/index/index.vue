@@ -7,7 +7,7 @@
           <div class="layout-nav">
             <MenuItem name="1">
               <Icon type="ios-navigate"></Icon>
-              协议列表
+              <router-link to="/index">协议列表</router-link>
             </MenuItem>
             <MenuItem name="2">
               <Icon type="ios-keypad"></Icon>
