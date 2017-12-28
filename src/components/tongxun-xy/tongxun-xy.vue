@@ -310,11 +310,11 @@
       }
     },
     computed: {
-      checkedTpType (){
+      checkedTpType () {
         var str = this.searchStr
         var TCP = str.indexOf('TCP')
         var RTU = str.indexOf('RTU')
-        var ENS = str.indexOf('ENS')
+  //      var ENS = str.indexOf('ENS')
         if (TCP !== -1) {
           return 'ethernet'
         } else if (RTU !== -1) {
@@ -403,7 +403,6 @@
             var str = this.searchStr.replace('-', '_') + '_W'
             str += `&${this.data1[index].id}`
             this.$http.get(`../cgi-bin/data_delete.cgi?${str}`).then((response) => {
-              console.log(response);
               if (response.data.result === 'true') {
                 this.getList(this.searchStr, this.page, 'write')
                 this.$Message.info('删除成功')
@@ -415,7 +414,7 @@
           onCancel: () => {
             this.$Message.info('放弃删除')
           }
-        });
+        })
       },
       //  显示添加
       showAdd () {
@@ -439,9 +438,7 @@
         for (let i in this.addMsg) {
           str += `${this.addMsg[i]}&`
         }
-        console.log(str);
         this.$http.get(`../cgi-bin/data_insert.cgi?${str}`).then((response) => {
-          console.log(response);
           if (response.data.result === 'true') {
             this.getList(this.searchStr, this.page, 'write')
             this.$Message.info('添加成功')
@@ -455,15 +452,13 @@
         this.$Message.info('放弃添加')
       },
       // 删除所有数据
-      deleteAll() {
+      deleteAll () {
         this.$Modal.confirm({
           title: '删除所有',
           content: '<p>确定是否删除所有数据</p>',
           onOk: () => {
-            var str = this.searchStr.replace('-', '_') + '_W'
-            str += `&${this.data1[index].id}`
-            this.$http.get(`../cgi-bin/data_delete.cgi?${str}`).then((response) => {
-              console.log(response);
+            this.$http.get(`../cgi-bin/empty_data.cgi`).then((response) => {
+              console.log(response)
               if (response.data.result === 'true') {
                 this.getList(this.searchStr, this.page, 'write')
                 this.$Message.info('删除成功')
@@ -475,8 +470,8 @@
           onCancel: () => {
             this.$Message.info('放弃删除')
           }
-        });
-      },
+        })
+      }
     }
   }
 </script>

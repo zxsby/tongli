@@ -80,6 +80,41 @@
         </FormItem>
       </Form>
     </Modal>
+    <Modal
+      v-model="ensModal"
+      title="修改网口参数"
+      @on-ok="EnsOk"
+      @on-cancel="RtuCancel">
+      <Form :model="selectEns" label-position="right" :label-width="100">
+        <FormItem label="标识:">
+          <Input v-model="selectEns.id" disabled></Input>
+        </FormItem>
+        <FormItem label="名称:">
+          <Input v-model="selectEns.name" disabled></Input>
+        </FormItem>
+        <FormItem label="CPU类:">
+          <Input v-model="selectEns.cpu" disabled></Input>
+        </FormItem>
+        <FormItem label="服务器IP:">
+          <Input v-model="selectEns.serverip"></Input>
+        </FormItem>
+        <FormItem label="端口:">
+          <Input v-model="selectEns.port"></Input>
+        </FormItem>
+        <FormItem label="远程从站地址:">
+          <Input v-model="selectEns.slaveaddr"></Input>
+        </FormItem>
+        <FormItem label="读取时间:">
+          <Input v-model="selectEns.readtime"></Input>
+        </FormItem>
+        <FormItem label="超时时间:">
+          <Input v-model="selectEns.timeout"></Input>
+        </FormItem>
+        <FormItem label="打印调试信息:">
+          <Input v-model="selectEns.printdebug"></Input>
+        </FormItem>
+      </Form>
+    </Modal>
   </Layout>
 
 </template>
@@ -173,6 +208,7 @@
         ],
         modal: false,
         modal1: false,
+        ensModal: false,
         selectTcp: {
           id: '',
           name: '',
@@ -195,6 +231,17 @@
           acdevname: '',
           readtime: '',
           printdebug: ''
+        },
+        selectEns: {
+          id: '',
+          name: '',
+          cpu: '',
+          serverip: '',
+          port: '',
+          slaveaddr: '',
+          readtime: '',
+          timeout: '',
+          printdebug: ''
         }
       }
     },
@@ -216,26 +263,35 @@
 //          console.log(response);
           this.GetXieYi()
         }).catch((error) => {
-//          console.log(error)
+          console.log(error)
         })
       },
       change (i) {
         if (this.data1[i].type === 'MOD-TCP') {
           this.$http.get(`../cgi-bin/modtcp_select.cgi?${this.data1[i].name}`).then((response) => {
             this.selectTcp = response.data
-          }).catch( (error) => {
+          }).catch((error) => {
             console.log(error)
           })
           this.modal = true
-        } else {
+        } else if (this.data1[i].type === 'MOD-RTU') {
           this.$http.get(`../cgi-bin/modrtu_select.cgi?${this.data1[i].name}`).then((response) => {
             this.selectRtu = response.data
           }).catch((error) => {
             console.log(error)
           })
           this.modal1 = true
+        } else if (this.data1[i].type === 'SIEMENS') {
+          this.$http.get(`../cgi-bin/siemens_select.cgi?${this.data1[i].name}`).then((response) => {
+            this.ensModal = true
+            this.selectEns = response.data
+            console.log(response)
+          }).catch((error) => {
+            console.log(error)
+          })
         }
       },
+      //  显示详情
       show (index) {
         this.$router.push(`/index/${this.data1[index].name}`)
       },
@@ -255,7 +311,6 @@
         }).catch((error) => {
           console.log(error)
         })
-
       },
       TcpCancel () {
         this.$Message.info('Tcp cancel')
@@ -264,7 +319,6 @@
         var str = ''
         for (var i in this.selectRtu) {
           str += this.selectRtu[i] + '&'
-
         }
         this.$http.get(`../cgi-bin/modrtu_modify.cgi?${str}`).then((response) => {
           if (response.data.result === 'true') {
@@ -279,6 +333,23 @@
       },
       RtuCancel () {
         this.$Message.info('Rtu cancel')
+      },
+      EnsOk() {
+        var str = ''
+        for (var i in this.selectEns) {
+          str += this.selectEns[i] + '&'
+        }
+        console.log(str);
+        this.$http.get(`../cgi-bin/siemens_modify.cgi?${str}`).then((response) => {
+          if (response.data.result === 'true') {
+            this.$Message.info('修改成功')
+            this.GetXieYi()
+          } else {
+            this.$Message.info('修改失败')
+          }
+        }).catch((error) => {
+          console.log(error)
+        })
       }
     }
   }
