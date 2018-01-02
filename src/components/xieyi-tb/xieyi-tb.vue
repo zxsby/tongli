@@ -145,7 +145,7 @@
             key: 'tptype'
           },
           {
-            title: '是否使能',
+            title: '是否使用',
             key: 'enable'
           },
           {
