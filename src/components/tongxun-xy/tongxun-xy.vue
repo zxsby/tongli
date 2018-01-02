@@ -322,7 +322,7 @@
         this.optionDataType = this.data[index].datatype
         var FunType = this.data[index].functiontype
         console.log(FunType)
-        if (FunType == 'Bit' || FunType == 'Inputbit') {
+        if (FunType === 'Bit' || FunType === 'Inputbit') {
           this.FunctionTypeList = [
             {
               value: 'Bit',
@@ -333,7 +333,7 @@
               label: 'Inputbit'
             }
           ]
-        } else if (FunType == 'Int' || FunType == 'Inputint') {
+        } else if (FunType === 'Int' || FunType === 'Inputint') {
           this.FunctionTypeList = [
             {
               value: 'Int',
@@ -344,7 +344,7 @@
               label: 'Inputint'
             }
           ]
-        } else if (FunType == 'Double' || FunType == 'InputDouble') {
+        } else if (FunType === 'Double' || FunType === 'InputDouble') {
           this.FunctionTypeList = [
             {
               value: 'Double',
@@ -355,7 +355,7 @@
               label: 'InputDouble'
             }
           ]
-        } else if (FunType == 'Float' || FunType == 'InputFloat') {
+        } else if (FunType === 'Float' || FunType === 'InputFloat') {
           this.FunctionTypeList = [
             {
               value: 'Float',
@@ -391,7 +391,7 @@
                 label: 'Inputbit'
               }
             ]
-            break;
+            break
           case 'int':
             this.FunctionTypeList = [
               {
@@ -403,7 +403,7 @@
                 label: 'Inputint'
               }
             ]
-            break;
+            break
           case 'float':
             this.FunctionTypeList = [
               {
@@ -415,7 +415,7 @@
                 label: 'Inputint'
               }
             ]
-            break;
+            break
           case 'double':
             this.FunctionTypeList = [
               {
@@ -427,13 +427,12 @@
                 label: 'InputDouble'
               }
             ]
-            break;
+            break
           default:
         }
       },
       //  确认修改
       ChangeOk () {
-        console.log(this.numIf);
         var str = this.searchStr.replace('-', '_')
         this.numIf ? str += '_W&' : str += '_R&'
         console.log(str)
@@ -510,7 +509,7 @@
                 label: 'Inputbit'
               }
             ]
-            break;
+            break
           case 'int':
             this.FunctionTypeList = [
               {
@@ -522,7 +521,7 @@
                 label: 'Inputint'
               }
             ]
-            break;
+            break
           case 'float':
             this.FunctionTypeList = [
               {
@@ -534,7 +533,7 @@
                 label: 'Inputint'
               }
             ]
-            break;
+            break
           case 'double':
             this.FunctionTypeList = [
               {
@@ -546,37 +545,36 @@
                 label: 'InputDouble'
               }
             ]
-            break;
+            break
           default:
         }
       },
       ChangeFunctionOptionChange (value) {
-        console.log(value)
         switch (value) {
           case 'Bit':
             this.changeMsg.functiontype = 1
-            break;
+            break
           case 'Inputbit':
             this.changeMsg.functiontype = 2
-            break;
+            break
           case 'Int':
             this.changeMsg.functiontype = 3
-            break;
+            break
           case 'Inputint':
             this.changeMsg.functiontype = 4
-            break;
+            break
           case 'Double':
             this.changeMsg.functiontype = 5
-            break;
+            break
           case 'InputDouble':
             this.changeMsg.functiontype = 6
-            break;
+            break
           case 'Float':
             this.changeMsg.functiontype = 7
-            break;
+            break
           case 'InputFloat':
             this.changeMsg.functiontype = 8
-            break;
+            break
           default:
         }
       },
@@ -584,28 +582,28 @@
         switch (value) {
           case 'Bit':
             this.addMsg.functiontype = 1
-            break;
+            break
           case 'Inputbit':
             this.addMsg.functiontype = 2
-            break;
+            break
           case 'Int':
             this.addMsg.functiontype = 3
-            break;
+            break
           case 'Inputint':
             this.addMsg.functiontype = 4
-            break;
+            break
           case 'Double':
             this.addMsg.functiontype = 5
-            break;
+            break
           case 'InputDouble':
             this.addMsg.functiontype = 6
-            break;
+            break
           case 'Float':
             this.addMsg.functiontype = 7
-            break;
+            break
           case 'InputFloat':
             this.addMsg.functiontype = 8
-            break;
+            break
           default:
         }
       },
@@ -615,6 +613,14 @@
         this.numIf ? str += '_W&' : str += '_R&'
         str += `${this.searchStr}&${this.checkedTpType}&`
         for (let i in this.addMsg) {
+          if (this.addMsg[i] === '') {
+            this.$Message.info({
+              content: '请填写完整数据',
+              duration: 10,
+              closable: true
+            })
+            return
+          }
           str += `${this.addMsg[i]}&`
         }
         this.$http.get(`../cgi-bin/data_insert.cgi?${str}`).then((response) => {
@@ -663,13 +669,11 @@
           }
         })
       },
-      deleteChecked(i) {
+      deleteChecked (i) {
         this.numIf ? this.deleteWrtArr = i : this.deleteRedArr = i
-
       },
       //  验证用户名
-      OnBlur(bool) {
-
+      OnBlur (bool) {
         var str = this.searchStr.replace('-', '_')
         this.numIf ? str += '_W&' : str += '_R&'
         if (bool) {
@@ -678,19 +682,20 @@
           str += this.changeMsg.data_name
         }
         this.$http.get(`../cgi-bin/data_name_query.cgi?${str}`).then((response) => {
-          if (response.data.data === 'true') {
-            this.$Message.success('该名称可以使用');
-          } else if (response.data.data === 'false') {
+          if (response.data.result === 'true') {
+            console.log(1)
+            this.$Message.success('该名称可以使用')
+          } else if (response.data.result === 'false') {
+            console.log(2)
             this.$Message.info({
               content: '该用户名已存在',
               duration: 10,
               closable: true
-            });
+            })
           }
         }).catch((error) => {
           console.log(error)
         })
-
       }
     }
   }

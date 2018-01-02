@@ -334,12 +334,11 @@
       RtuCancel () {
         this.$Message.info('Rtu cancel')
       },
-      EnsOk() {
+      EnsOk () {
         var str = ''
         for (var i in this.selectEns) {
           str += this.selectEns[i] + '&'
         }
-        console.log(str);
         this.$http.get(`../cgi-bin/siemens_modify.cgi?${str}`).then((response) => {
           if (response.data.result === 'true') {
             this.$Message.info('修改成功')
