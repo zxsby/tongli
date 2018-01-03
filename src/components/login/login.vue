@@ -42,6 +42,7 @@
         })
           .then((response) => {
             if (response.data.result === 'true') {
+              localStorage.setItem('uname', this.uname)
               this.$router.push('/index')
             } else {
               this.warning(true)

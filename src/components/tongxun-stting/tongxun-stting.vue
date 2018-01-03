@@ -29,7 +29,7 @@
         </div>
         <div>
           <span>设置云服务器IP</span>
-          <Input @on-blur="checkIp(1)" style="width:35%" :disabled="IpBool" v-model="setMsg[0].cloud_serverip"
+          <Input @on-blur="checkIp('1')" style="width:35%" :disabled="IpBool" v-model="setMsg[0].cloud_serverip"
                  placeholder="请输入IP"></Input>
           <Button @click="toggleIpBool('ip')" type="warning">设置</Button>
         </div>
@@ -46,22 +46,40 @@
         <Col span="12">
         <div>
           <span>设置数据采集器IP</span>
-          <Input @on-blur="checkIp(2)" style="width:35%" :disabled="CJQip" v-model="CaiJiQiIp"
+          <Input @on-blur="checkIp('2')" style="width:35%" :disabled="CJQip" v-model="CaiJiQiIp"
                  placeholder="请输入IP"></Input>
           <Button type="warning" @click="toggleIpBool ('cjq')">设置</Button>
           <Button type="warning" @click="subCjqIp" :disabled="ipSub">提交</Button>
         </div>
         <div>
-          <Button type="warning">表数据清空</Button>
+          <Button type="warning" @click="deleteAll">表数据清空</Button>
         </div>
         <div>
-          <Button type="warning">重启数据采集器</Button>
+          <Button type="warning" @click="chongqi">重启数据采集器</Button>
         </div>
         <div>
-          <Button type="warning">修改密码</Button>
+          <Button type="warning" @click="changePassword">修改密码</Button>
         </div>
         </Col>
       </Row>
+      <Modal
+        title="Title"
+        v-model="changepsd"
+        class-name="vertical-center-modal"
+        @on-ok="changeOk"
+        @on-cancel="noChange">
+        <Form :model="changepswd" label-position="right" :label-width="100">
+          <FormItem label="旧密码:">
+            <Input type="password" v-model="changepswd.old"></Input>
+          </FormItem>
+          <FormItem label="新密码:">
+            <Input type="password" v-model="changepswd.new"></Input>
+          </FormItem>
+          <FormItem label="再次输入新密码:">
+            <Input type="password" v-model="changepswd.checkNew"></Input>
+          </FormItem>
+        </Form>
+      </Modal>
     </Content>
   </Layout>
 </template>
@@ -75,8 +93,14 @@
         CJQip: true,
         submit: false,
         ipSub: false,
+        changepsd: false,
         setMsg: [],
-        CaiJiQiIp: ''
+        CaiJiQiIp: '',
+        changepswd: {
+          old: '',
+          new: '',
+          checkNew: ''
+        }
       }
     },
     mounted () {
@@ -94,14 +118,14 @@
       },
       getCaiJiQiIp () {
         this.$http.get('../cgi-bin/getip.cgi').then((result) => {
-          this.CaiJiQiIp=result.data.eth0
+          this.CaiJiQiIp = result.data.eth0
         }).catch((err) => {
           console.log(err)
         })
       },
       getSetting () {
         this.$http.get('../cgi-bin/com_setting_select.cgi').then((result) => {
-          this.setMsg = result.data
+          this.setMsg.push(result.data)
         }).catch((err) => {
           console.log(err)
         })
@@ -111,13 +135,13 @@
       },
       checkIp (num) {
         var reg = /(25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d)\.(25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d)\.(25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d)\.(25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d)/
-        var bool = reg.test(this.setMsg[0].cloud_serverip)
+        var bool = num === '1' ? reg.test(this.setMsg[0].cloud_serverip) : reg.test(this.CaiJiQiIp)
         if (bool) {
           this.$Message.info('ip格式正确')
-          num === 1 ? this.submit = false : this.ipSub = false
+          num === '1' ? this.submit = false : this.ipSub = false
         } else {
           this.$Message.error('ip格式填写不正确')
-          num === 1 ? this.submit = true : this.ipSub = true
+          num === '1' ? this.submit = true : this.ipSub = true
         }
       },
       changeType1 (msg) {
@@ -166,7 +190,7 @@
           onCancel: () => {
             this.$Message.info('放弃修改')
           }
-        });
+        })
       },
       subCjqIp () {
         this.$http.get(`../cgi-bin/setip.cgi?${this.CaiJiQiIp}`).then((result) => {
@@ -178,10 +202,74 @@
         }).catch((err) => {
           console.log(err)
         })
+      },
+      deleteAll () {
+        this.$Modal.confirm({
+          title: '清空',
+          content: '<p>确定清空配置？</p>',
+          okText: '确定',
+          cancelText: '放弃',
+          onOk: () => {
+            this.$http.get(`../cgi-bin/empty_data.cgi`).then((result) => {
+              if (result.data.result === 'true') {
+                this.$Message.success('清空成功')
+              } else {
+                this.$Message.error('清空失败')
+              }
+            }).catch((err) => {
+              console.log(err)
+            })
+          },
+          onCancel: () => {
+            this.$Message.info('放弃修改')
+          }
+        })
+      },
+      chongqi () {
+        this.$http.get('../cgi-bin/reboot.cgi').then((result) => {
+          console.log(result)
+        }).catch((err) => {
+          console.log(err)
+        })
+      },
+      changePassword () {
+        this.changepsd = true
+      },
+      changeOk () {
+        for (var i in this.changepswd) {
+          if (this.changepswd[i] === '') {
+            this.$Message.info({
+              content: '请填写完整数据',
+              duration: 10,
+              closable: true
+            })
+            setTimeout(() => {
+              this.changepsd = true
+            }, 10)
+            return
+          }
+          if (this.changepswd.new !== this.changepswd.checkNew) {
+            this.$Message.error('两次密码不一致')
+            setTimeout(() => {
+              this.changepsd = true
+            }, 10)
+            return
+          }
+          this.$http.get().then().catch()
+        }
       }
     }
   }
 </script>
 
 <style>
+  .vertical-center-modal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .vertical-center-modal > .ivu-modal {
+    top: 0;
+  }
 </style>
