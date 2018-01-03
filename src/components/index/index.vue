@@ -2,16 +2,16 @@
   <div class="layout">
     <Layout>
       <Header>
-        <Menu mode="horizontal" theme="dark" active-name="1">
+        <Menu @on-select="goTo" mode="horizontal" theme="dark" active-name="1">
           <div class="layout-logo"></div>
           <div class="layout-nav">
             <MenuItem name="1">
               <Icon type="ios-navigate"></Icon>
-              <router-link to="/index">协议列表</router-link>
+              协议列表
             </MenuItem>
             <MenuItem name="2">
               <Icon type="ios-keypad"></Icon>
-              Item 2
+              通讯设置
             </MenuItem>
             <MenuItem name="3">
               <Icon type="ios-analytics"></Icon>
@@ -61,6 +61,15 @@
 </template>
 <script>
   export default {
+    methods: {
+      goTo (i) {
+        if (i === '1') {
+          this.$router.push('/XieyiTb')
+        } else if (i === '2') {
+          this.$router.push('/TXstting')
+        }
+      }
+    }
   }
 </script>
 <style scoped>

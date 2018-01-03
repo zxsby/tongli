@@ -116,7 +116,6 @@
       </Form>
     </Modal>
   </Layout>
-
 </template>
 
 <script type="text/ecmascript-6">
@@ -293,7 +292,7 @@
       },
       //  显示详情
       show (index) {
-        this.$router.push(`/index/${this.data1[index].name}`)
+        this.$router.push(`/XieyiTb/${this.data1[index].name}`)
       },
       //  tcp确定修改
       TcpOk () {
