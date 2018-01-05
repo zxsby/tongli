@@ -20,22 +20,25 @@
           <Input v-model="selectTcp.name" disabled></Input>
         </FormItem>
         <FormItem label="站点地址:">
-          <Input v-model="selectTcp.slaveaddr"></Input>
+          <Input type="number" @on-blur="checkIp('Tcp')" v-model="selectTcp.slaveaddr"></Input>
         </FormItem>
         <FormItem label="超时时间:">
-          <Input v-model="selectTcp.timeout"></Input>
+          <Input type="number" v-model="selectTcp.timeout"></Input>
         </FormItem>
         <FormItem label="端口:">
-          <Input v-model="selectTcp.port"></Input>
+          <Input type="number" v-model="selectTcp.port"></Input>
         </FormItem>
         <FormItem label="IP地址:">
           <Input v-model="selectTcp.ip"></Input>
         </FormItem>
         <FormItem label="读取时间:">
-          <Input v-model="selectTcp.readtime"></Input>
+          <Input type="number" v-model="selectTcp.readtime"></Input>
         </FormItem>
         <FormItem label="打印调试信息:">
-          <Input v-model="selectTcp.printdebug"></Input>
+          <Select @on-change="dayingTcpOptionChange" v-model="selectTcp.printdebug" transfer="true"
+                  style="width:200px">
+            <Option v-for="item in dayingTcp" :value="item.value" :key="item.value">{{ item.label }}</Option>
+          </Select>
         </FormItem>
       </Form>
     </Modal>
@@ -112,22 +115,25 @@
           <Input v-model="selectEns.cpu" disabled></Input>
         </FormItem>
         <FormItem label="服务器IP:">
-          <Input v-model="selectEns.serverip"></Input>
+          <Input @on-blur="checkIp('Ens')" v-model="selectEns.serverip"></Input>
         </FormItem>
         <FormItem label="端口:">
-          <Input v-model="selectEns.port"></Input>
+          <Input type="number" v-model="selectEns.port"></Input>
         </FormItem>
         <FormItem label="远程从站地址:">
-          <Input v-model="selectEns.slaveaddr"></Input>
+          <Input type="number" v-model="selectEns.slaveaddr"></Input>
         </FormItem>
         <FormItem label="读取时间:">
-          <Input v-model="selectEns.readtime"></Input>
+          <Input type="number" v-model="selectEns.readtime"></Input>
         </FormItem>
         <FormItem label="超时时间:">
-          <Input v-model="selectEns.timeout"></Input>
+          <Input type="number" v-model="selectEns.timeout"></Input>
         </FormItem>
         <FormItem label="打印调试信息:">
-          <Input v-model="selectEns.printdebug"></Input>
+          <Select @on-change="dayingEnsOptionChange" v-model="selectEns.printdebug" transfer="true"
+                  style="width:200px">
+            <Option v-for="item in dayingEns" :value="item.value" :key="item.value">{{ item.label }}</Option>
+          </Select>
         </FormItem>
       </Form>
     </Modal>
@@ -386,6 +392,26 @@
             value: '0',
             label: '否'
           }
+        ],
+        dayingTcp: [
+          {
+            value: '1',
+            label: '是'
+          },
+          {
+            value: '0',
+            label: '否'
+          }
+        ],
+        dayingEns: [
+          {
+            value: '1',
+            label: '是'
+          },
+          {
+            value: '0',
+            label: '否'
+          }
         ]
       }
     },
@@ -441,6 +467,12 @@
       },
       //  tcp确定修改
       TcpOk () {
+        if (!this.checkIp('Tcp')) {
+          setTimeout(() => {
+            this.ensModal = true
+          }, 10)
+          return
+        }
         var str = ''
         for (var i in this.selectTcp) {
           str += this.selectTcp[i] + '&'
@@ -479,6 +511,12 @@
         this.$Message.info('Rtu cancel')
       },
       EnsOk () {
+        if (!this.checkIp('Ens')) {
+          setTimeout(() => {
+            this.ensModal = true
+          }, 10)
+          return
+        }
         var str = ''
         for (var i in this.selectEns) {
           str += this.selectEns[i] + '&'
@@ -499,11 +537,6 @@
       },
       shujuweiOptionChange (value) {
         this.selectRtu.databit = value
-        this.$http.get('../cgi-bin/monitor_data_select.cgi').then((result) => {
-          console.log(result)
-        }).catch((err) => {
-          console.log(err)
-        })
       },
       chuankouhaoOptionChange (value) {
         this.selectRtu.acdevname = value
@@ -516,6 +549,23 @@
       },
       dayingRtuOptionChange (value) {
         this.selectRtu.printdebug = value
+      },
+      dayingEnsOptionChange (value) {
+        this.selectEns.printdebug = value
+      },
+      dayingTcpOptionChange (value) {
+        this.selectTcp.printdebug = value
+      },
+      checkIp (num) {
+        var reg = /(25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d)\.(25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d)\.(25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d)\.(25[0-5]|2[0-4]\d|[0-1]\d{2}|[1-9]?\d)/
+        var bool = num === 'Tcp' ? reg.test(this.selectTcp.slaveaddr) : reg.test(this.selectEns.serverip)
+        if (bool) {
+          this.$Message.info('ip格式正确')
+          return true
+        } else {
+          this.$Message.error('ip格式填写不正确')
+          return false
+        }
       }
     }
   }

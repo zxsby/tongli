@@ -177,8 +177,8 @@
     margin-right: 10px;
   }
 
-  .ivu-menu-submenu-title span > i {
-    margin-right: 0;
+  #a > i {
+    margin-right: 0px
   }
 </style>
 <template>
@@ -200,14 +200,14 @@
           </MenuItem>
         </Menu>
       </Sider>
-      <Layout>
+      <Layout style="">
         <Header :style="{padding: 0}" class="layout-header-bar">
           <Icon @click.native="collapsedSider" :class="rotateIcon" :style="{margin: '20px 20px 0'}" type="navicon-round"
                 size="24"></Icon>
           <Menu @on-select="User" class="header" mode="horizontal" :theme="dark" active-name="1">
             <Submenu name="3">
               <template slot="title">
-                <Avatar icon="person"/>
+                <Avatar id="a" icon="person"/>
                 <span>{{uname}}</span>
               </template>
               <MenuGroup title="设置">
@@ -286,6 +286,8 @@
           this.$router.push('/XieyiTb')
         } else if (i === '2') {
           this.$router.push('/TXstting')
+        } else if (i === '3') {
+          this.$router.push('/JianKong')
         }
       },
       User (i) {

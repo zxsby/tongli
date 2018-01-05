@@ -46,7 +46,7 @@
     </Tabs>
     <Modal
       v-model="changeShow"
-      title="修改XXXXX"
+      :title="title"
       @on-ok="ChangeOk"
       @on-cancel="NoChange">
       <Form :model="changeMsg" label-position="right" :label-width="100">
@@ -111,7 +111,7 @@
             <Option v-for="item in FunctionTypeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
           </Select>
         </FormItem>
-        <FormItem   label="数据:">
+        <FormItem label="数据:">
           <Input type="number" v-model="addMsg.buff"></Input>
         </FormItem>
       </Form>
@@ -259,6 +259,13 @@
       }
     },
     computed: {
+      title () {
+        if (this.numIf) {
+          return '修改写设置列表'
+        } else {
+          return '修改读设置列表'
+        }
+      },
       checkedTpType () {
         var str = this.searchStr
         var TCP = str.indexOf('TCP')

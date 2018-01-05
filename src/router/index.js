@@ -5,6 +5,7 @@ import login from '../components/login/login.vue'
 import XieyiTb from '../components/xieyi-tb/xieyi-tb.vue'
 import tongxunXy from '../components/tongxun-xy/tongxun-xy.vue'
 import tongxunstting from '../components/tongxun-stting/tongxun-stting.vue'
+import jiankongpingtai from '../components/jiankong/jiankong.vue'
 
 Vue.use(Router)
 
@@ -27,6 +28,9 @@ export default new Router({
         }, {
           path: '/TXstting',
           component: tongxunstting
+        }, {
+          path: '/JianKong',
+          component: jiankongpingtai
         }]
     },
     {
