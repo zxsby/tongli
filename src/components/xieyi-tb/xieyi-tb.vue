@@ -1,11 +1,11 @@
 <template>
   <Layout :style="{padding: '0 24px 24px'}">
     <Breadcrumb :style="{margin: '24px 0'}">
-      <BreadcrumbItem>Home</BreadcrumbItem>
       <BreadcrumbItem>协议列表</BreadcrumbItem>
     </Breadcrumb>
-    <Content :style="{padding: '24px', minHeight: '280px', background: '#fff'}">
+    <Content :style="{padding: '24px', minHeight: '500px', background: '#fff'}">
       <Table border :columns="columns1" :data="data1"></Table>
+      <Spin size="large" fix v-if="data1.length<1"></Spin>
     </Content>
     <Modal
       v-model="modal"
@@ -41,7 +41,7 @@
     </Modal>
     <Modal
       v-model="modal1"
-      title="修改网口参数"
+      title="修改串口参数"
       @on-ok="RtuOk"
       @on-cancel="RtuCancel">
       <Form :model="selectRtu" label-position="right" :label-width="100">
@@ -52,31 +52,47 @@
           <Input v-model="selectRtu.name" disabled></Input>
         </FormItem>
         <FormItem label="站点地址:">
-          <Input v-model="selectRtu.slaveaddr"></Input>
+          <Input type="number" min="0" max="255" v-model="selectRtu.slaveaddr" placeholder="0-255"></Input>
         </FormItem>
         <FormItem label="超时时间:">
-          <Input v-model="selectRtu.timeout"></Input>
+          <Input type="number" min="0" max="10" v-model="selectRtu.timeout" placeholder="0-10"></Input>
         </FormItem>
         <FormItem label="波特率:">
-          <Input v-model="selectRtu.baud"></Input>
+          <Select @on-change="botelvOptionChange" v-model="selectRtu.baud" transfer="true" style="width:200px">
+            <Option v-for="item in botelv" :value="item.value" :key="item.value">{{ item.label }}</Option>
+          </Select>
         </FormItem>
         <FormItem label="数据位:">
-          <Input v-model="selectRtu.databit"></Input>
+          <Select @on-change="shujuweiOptionChange" v-model="selectRtu.databit" transfer="true" style="width:200px">
+            <Option v-for="item in shujuwei" :value="item.value" :key="item.value">{{ item.label }}</Option>
+          </Select>
         </FormItem>
         <FormItem label="停止位:">
-          <Input v-model="selectRtu.stopbit"></Input>
+          <Select @on-change="tingzhiweiOptionChange" v-model="selectRtu.stopbit" transfer="true"
+                  style="width:200px">
+            <Option v-for="item in tingzhiwei" :value="item.value" :key="item.value">{{ item.label }}</Option>
+          </Select>
         </FormItem>
         <FormItem label="奇偶校验:">
-          <Input v-model="selectRtu.acParity"></Input>
+          <Select @on-change="jioujiaoyanOptionChange" v-model="selectRtu.acParity" transfer="true"
+                  style="width:200px">
+            <Option v-for="item in jioujiaoyan" :value="item.value" :key="item.value">{{ item.label }}</Option>
+          </Select>
         </FormItem>
         <FormItem label="串口号:">
-          <Input v-model="selectRtu.acdevname"></Input>
+          <Select @on-change="chuankouhaoOptionChange" v-model="selectRtu.acdevname" transfer="true"
+                  style="width:200px">
+            <Option v-for="item in chuankouhao" :value="item.value" :key="item.value">{{ item.label }}</Option>
+          </Select>
         </FormItem>
         <FormItem label="读取时间:">
-          <Input v-model="selectRtu.readtime"></Input>
+          <Input type="number" min="1" max="10000" v-model="selectRtu.readtime" placeholder="0-10000"></Input>
         </FormItem>
         <FormItem label="打印调试信息:">
-          <Input v-model="selectRtu.printdebug"></Input>
+          <Select @on-change="dayingRtuOptionChange" v-model="selectRtu.printdebug" transfer="true"
+                  style="width:200px">
+            <Option v-for="item in dayingRtu" :value="item.value" :key="item.value">{{ item.label }}</Option>
+          </Select>
         </FormItem>
       </Form>
     </Modal>
@@ -132,7 +148,7 @@
             key: 'name'
           },
           {
-            title: '主从模式',
+            title: '主(M)从(S)模式',
             key: 'model'
           },
           {
@@ -140,11 +156,11 @@
             key: 'type'
           },
           {
-            title: '串/网口',
+            title: '串口(ser)/网口(eth)',
             key: 'tptype'
           },
           {
-            title: '是否使用',
+            title: '是(1)否(0)使用',
             key: 'enable'
           },
           {
@@ -241,7 +257,136 @@
           readtime: '',
           timeout: '',
           printdebug: ''
-        }
+        },
+        botelv: [
+          {
+            value: '300',
+            label: '300'
+          }, {
+            value: '600',
+            label: '600'
+          }, {
+            value: '1200',
+            label: '1200'
+          }, {
+            value: '2400',
+            label: '2400'
+          }, {
+            value: '4800',
+            label: '4800'
+          }, {
+            value: '9600',
+            label: '9600'
+          }, {
+            value: '14400',
+            label: '14400'
+          }, {
+            value: '19200',
+            label: '19200'
+          }, {
+            value: '38400',
+            label: '38400'
+          }, {
+            value: '56000',
+            label: '56000'
+          }, {
+            value: '57600',
+            label: '57600'
+          }, {
+            value: '115200',
+            label: '115200'
+          }
+        ],
+        shujuwei: [
+          {
+            value: '8',
+            label: '8'
+          },
+          {
+            value: '7',
+            label: '7'
+          }
+        ],
+        chuankouhao: [
+          {
+            value: 'ttyS0',
+            label: 'ttyS0'
+          },
+          {
+            value: 'ttyS1',
+            label: 'ttyS1'
+          },
+          {
+            value: 'ttyS2',
+            label: 'ttyS2'
+          },
+          {
+            value: 'ttyS3',
+            label: 'ttyS3'
+          },
+          {
+            value: 'ttyS4',
+            label: 'ttyS4'
+          },
+          {
+            value: 'ttyS5',
+            label: 'ttyS5'
+          },
+          {
+            value: 'ttyS6',
+            label: 'ttyS6'
+          },
+          {
+            value: 'ttyS7',
+            label: 'ttyS7'
+          },
+          {
+            value: 'ttyS8',
+            label: 'ttyS8'
+          },
+          {
+            value: 'ttyS9',
+            label: 'ttyS9'
+          },
+          {
+            value: 'ttyS10',
+            label: 'ttyS10'
+          }
+        ],
+        jioujiaoyan: [
+          {
+            value: 'N',
+            label: 'N'
+          },
+          {
+            value: 'O',
+            label: 'O'
+          },
+          {
+            value: 'E',
+            label: 'E'
+          }
+        ],
+        tingzhiwei: [
+          {
+            value: '1',
+            label: '1'
+          },
+          {
+            value: '2',
+            label: '2'
+          }
+        ],
+        dayingRtu: [
+          {
+            value: '1',
+            label: '是'
+          },
+          {
+            value: '0',
+            label: '否'
+          }
+        ]
       }
     },
     mounted () {
@@ -312,7 +457,7 @@
         })
       },
       TcpCancel () {
-        this.$Message.info('Tcp cancel')
+        this.$Message.info('放弃修改')
       },
       RtuOk () {
         var str = ''
@@ -348,6 +493,29 @@
         }).catch((error) => {
           console.log(error)
         })
+      },
+      botelvOptionChange (value) {
+        this.selectRtu.baud = value
+      },
+      shujuweiOptionChange (value) {
+        this.selectRtu.databit = value
+        this.$http.get('../cgi-bin/monitor_data_select.cgi').then((result) => {
+          console.log(result)
+        }).catch((err) => {
+          console.log(err)
+        })
+      },
+      chuankouhaoOptionChange (value) {
+        this.selectRtu.acdevname = value
+      },
+      jioujiaoyanOptionChange (value) {
+        this.selectRtu.acParity = value
+      },
+      tingzhiweiOptionChange (value) {
+        this.selectRtu.stopbit = value
+      },
+      dayingRtuOptionChange (value) {
+        this.selectRtu.printdebug = value
       }
     }
   }

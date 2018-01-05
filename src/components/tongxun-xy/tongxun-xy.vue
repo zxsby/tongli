@@ -1,7 +1,6 @@
 <template>
   <Layout :style="{padding: '0 24px 24px'}">
     <Breadcrumb :style="{margin: '24px 0'}">
-      <BreadcrumbItem>Home</BreadcrumbItem>
       <BreadcrumbItem>
         <router-link to="/index">协议列表</router-link>
       </BreadcrumbItem>
@@ -9,7 +8,7 @@
     </Breadcrumb>
     <Tabs @on-click="tap">
       <TabPane label="读设置列表" icon="clipboard">
-        <Content :style="{padding: '24px', minHeight: '280px', background: '#fff'}">
+        <Content :style="{padding: '24px', minHeight: '500px', background: '#fff'}">
           <Tooltip placement="top" class="add" content="添加一个新设备">
             <Button @click="showAdd" type="primary">
               <Icon type="plus-circled"></Icon>
@@ -72,7 +71,7 @@
           </Select>
         </FormItem>
         <FormItem label="起始地址:">
-          <Input v-model="changeMsg.startaddr"></Input>
+          <Input type="number" v-model="changeMsg.startaddr"></Input>
         </FormItem>
         <FormItem label="功能码:">
           <Select @on-change="ChangeFunctionOptionChange" v-model="FunctionType" transfer="true" style="width:200px">
@@ -80,7 +79,7 @@
           </Select>
         </FormItem>
         <FormItem label="数据:">
-          <Input v-model="changeMsg.buff"></Input>
+          <Input type="number" v-model="changeMsg.buff"></Input>
         </FormItem>
       </Form>
     </Modal>
@@ -105,15 +104,15 @@
           </Select>
         </FormItem>
         <FormItem label="起始地址:">
-          <Input v-model="addMsg.startaddr"></Input>
+          <Input type="number" v-model="addMsg.startaddr"></Input>
         </FormItem>
         <FormItem label="功能码:">
           <Select @on-change="AddFunctionOptionChange" v-model="FunctionType" transfer="true" style="width:200px">
             <Option v-for="item in FunctionTypeList" :value="item.value" :key="item.value">{{ item.label }}</Option>
           </Select>
         </FormItem>
-        <FormItem label="数据:">
-          <Input v-model="addMsg.buff"></Input>
+        <FormItem   label="数据:">
+          <Input type="number" v-model="addMsg.buff"></Input>
         </FormItem>
       </Form>
     </Modal>
@@ -291,6 +290,7 @@
             return functiontype === '1' ? 'Bit' : functiontype === '2' ? 'Inputbit' : functiontype === '3' ? 'Int' : functiontype === '4' ? 'Inputint' : functiontype === '5' ? 'Double' : functiontype === '6' ? 'InputDouble' : functiontype === '7' ? 'Float' : functiontype === '8' ? 'InputFloat' : ''
           })
           this.data = response.data.data
+          console.log(this.data)
           for (var i = 0; i < arr.length; i++) {
             this.data[i].functiontype = arr[i]
           }
@@ -367,6 +367,7 @@
             }
           ]
         }
+        console.log(this.data[index].functiontype)
         this.FunctionType = this.data[index].functiontype
       },
 //      // 读修改
@@ -411,8 +412,8 @@
                 label: 'Float'
               },
               {
-                value: 'Inputint',
-                label: 'Inputint'
+                value: 'InputFloat',
+                label: 'InputFloat'
               }
             ]
             break
@@ -435,9 +436,37 @@
       ChangeOk () {
         var str = this.searchStr.replace('-', '_')
         this.numIf ? str += '_W&' : str += '_R&'
-        console.log(str)
         for (let i in this.changeMsg) {
           if (i === 'readno') {
+            continue
+          }
+          if (i === 'functiontype') {
+            switch (this.changeMsg[i]) {
+              case 'Bit':
+                str += `1&`
+                break
+              case 'Inputbit':
+                str += `2&`
+                break
+              case 'Int':
+                str += `3&`
+                break
+              case 'Inputint':
+                str += `4&`
+                break
+              case 'Double':
+                str += `5&`
+                break
+              case 'InputDouble':
+                str += `6&`
+                break
+              case 'Float':
+                str += `7&`
+                break
+              case 'InputFloat':
+                str += `8&`
+                break
+            }
             continue
           }
           str += `${this.changeMsg[i]}&`
@@ -465,7 +494,7 @@
           onOk: () => {
             var str = this.searchStr.replace('-', '_')
             this.numIf ? str += '_W&' : str += '_R&'
-            str += `&${this.data[index].id}`
+            str += `${this.data[index].id}`
             this.$http.get(`../cgi-bin/data_delete.cgi?${str}`).then((response) => {
               if (response.data.result === 'true') {
                 var type = ''
@@ -494,6 +523,9 @@
         }
         this.addoptionDataType = ''
         this.FunctionType = ''
+      },
+      AddFunctionOptionChange (value) {
+        this.addMsg.functiontype = value
       },
       addOptionChange (value) {
         this.addMsg.datatype = value
@@ -529,8 +561,8 @@
                 label: 'Float'
               },
               {
-                value: 'Inputint',
-                label: 'Inputint'
+                value: 'InputFloat',
+                label: 'InputFloat'
               }
             ]
             break
@@ -550,68 +582,14 @@
         }
       },
       ChangeFunctionOptionChange (value) {
-        switch (value) {
-          case 'Bit':
-            this.changeMsg.functiontype = 1
-            break
-          case 'Inputbit':
-            this.changeMsg.functiontype = 2
-            break
-          case 'Int':
-            this.changeMsg.functiontype = 3
-            break
-          case 'Inputint':
-            this.changeMsg.functiontype = 4
-            break
-          case 'Double':
-            this.changeMsg.functiontype = 5
-            break
-          case 'InputDouble':
-            this.changeMsg.functiontype = 6
-            break
-          case 'Float':
-            this.changeMsg.functiontype = 7
-            break
-          case 'InputFloat':
-            this.changeMsg.functiontype = 8
-            break
-          default:
-        }
-      },
-      AddFunctionOptionChange (value) {
-        switch (value) {
-          case 'Bit':
-            this.addMsg.functiontype = 1
-            break
-          case 'Inputbit':
-            this.addMsg.functiontype = 2
-            break
-          case 'Int':
-            this.addMsg.functiontype = 3
-            break
-          case 'Inputint':
-            this.addMsg.functiontype = 4
-            break
-          case 'Double':
-            this.addMsg.functiontype = 5
-            break
-          case 'InputDouble':
-            this.addMsg.functiontype = 6
-            break
-          case 'Float':
-            this.addMsg.functiontype = 7
-            break
-          case 'InputFloat':
-            this.addMsg.functiontype = 8
-            break
-          default:
-        }
+        this.changeMsg.functiontype = value
       },
       //  确定添加
       addOk () {
         var str = `${this.searchStr.replace('-', '_')}`
         this.numIf ? str += '_W&' : str += '_R&'
         str += `${this.searchStr}&${this.checkedTpType}&`
+        console.log(this.addMsg)
         for (let i in this.addMsg) {
           if (this.addMsg[i] === '') {
             this.$Message.info({
@@ -620,6 +598,35 @@
               closable: true
             })
             return
+          }
+          if (i === 'functiontype') {
+            switch (this.changeMsg[i]) {
+              case 'Bit':
+                str += `1&`
+                break
+              case 'Inputbit':
+                str += `2&`
+                break
+              case 'Int':
+                str += `3&`
+                break
+              case 'Inputint':
+                str += `4&`
+                break
+              case 'Double':
+                str += `5&`
+                break
+              case 'InputDouble':
+                str += `6&`
+                break
+              case 'Float':
+                str += `7&`
+                break
+              case 'InputFloat':
+                str += `8&`
+                break
+            }
+            continue
           }
           str += `${this.addMsg[i]}&`
         }

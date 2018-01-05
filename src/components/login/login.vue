@@ -75,11 +75,9 @@
     background-position: center center;
     z-index: 1;
   }
-
   .demo-1 .large-header {
     background-image: url('../../common/img/demo-1-bg.jpg');
   }
-
   .logo_box {
     width: 400px;
     height: 500px;

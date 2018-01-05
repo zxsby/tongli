@@ -14,16 +14,20 @@ export default new Router({
       path: '/index',
       name: 'index',
       component: index,
-      children: [{
-        path: '/XieyiTb',
-        component: XieyiTb
-      }, {
-        path: '/XieyiTb/:id',
-        component: tongxunXy
-      }, {
-        path: '/TXstting',
-        component: tongxunstting
-      }]
+      children: [
+        {
+          path: '/',
+          component: XieyiTb
+        }, {
+          path: '/XieyiTb',
+          component: XieyiTb
+        }, {
+          path: '/XieyiTb/:id',
+          component: tongxunXy
+        }, {
+          path: '/TXstting',
+          component: tongxunstting
+        }]
     },
     {
       path: '/',

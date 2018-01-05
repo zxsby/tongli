@@ -3,61 +3,71 @@
     <Breadcrumb :style="{margin: '24px 0'}">
       <BreadcrumbItem>通讯设置</BreadcrumbItem>
     </Breadcrumb>
-    <Content :style="{padding: '24px', minHeight: '280px', background: '#fff'}">
+    <Content :style="{padding: '24px', minHeight: '500px', background: '#fff'}">
       <Row>
         <Col span="12" v-if="setMsg.length>0">
-        <div>
+        <Breadcrumb :style="{margin: '24px 0'}">
+          <BreadcrumbItem>基本配置</BreadcrumbItem>
+        </Breadcrumb>
+        <Spin size="large" fix v-if="setMsg.length<1"></Spin>
+        <div class="item">
+          <p>设备id为：{{setMsg[0].device_id}}</p>
+        </div>
+        <div class="item">
           <span>与下位设备通讯</span>
           <Switch @on-change="changeType1" :value="checkType(setMsg[0].com_low_device)" size="large" class="switch">
             <span slot="open">使用</span>
             <span slot="close">不用</span>
           </Switch>
         </div>
-        <div>
+        <div class="item">
           <span>使用3G网卡与云服务器通讯</span>
           <Switch @on-change="changeType2" :value="checkType(setMsg[0].com_cloud_3g)" size="large" class="switch">
             <span slot="open">使用</span>
             <span slot="close">不用</span>
           </Switch>
         </div>
-        <div>
+        <div class="item">
           <span>使用普通网卡与云服务器通讯</span>
           <Switch @on-change="changeType3" :value="checkType(setMsg[0].eth_com_cloud)" size="large" class="switch">
             <span slot="open">使用</span>
             <span slot="close">不用</span>
           </Switch>
         </div>
-        <div>
+        <div class="item">
           <span>设置云服务器IP</span>
           <Input @on-blur="checkIp('1')" style="width:35%" :disabled="IpBool" v-model="setMsg[0].cloud_serverip"
                  placeholder="请输入IP"></Input>
-          <Button @click="toggleIpBool('ip')" type="warning">设置</Button>
+          <Button @click="toggleIpBool('ip')" type="info">设置</Button>
         </div>
-        <div>
+        <div class="item">
           <span>设置云服务器IP</span>
           <Input style="width:15%" :disabled="TimeBool" v-model="setMsg[0].time_com_cloud"
                  placeholder="请输入IP"></Input>
-          <Button type="warning" @click="toggleIpBool('Time')">设置</Button>
+          <Button type="info" @click="toggleIpBool('Time')">设置</Button>
         </div>
-        <div>
-          <Button @click="submitChange" type="warning" :disabled="submit">提交修改</Button>
+        <div class="item">
+          <Button @click="submitChange" type="success" :disabled="submit">提交修改</Button>
         </div>
         </Col>
         <Col span="12">
-        <div>
+        <Breadcrumb :style="{margin: '24px 0'}">
+          <BreadcrumbItem>高级配置</BreadcrumbItem>
+        </Breadcrumb>
+        <div class="item">
           <span>设置数据采集器IP</span>
           <Input @on-blur="checkIp('2')" style="width:35%" :disabled="CJQip" v-model="CaiJiQiIp"
                  placeholder="请输入IP"></Input>
-          <Button type="warning" @click="toggleIpBool ('cjq')">设置</Button>
-          <Button type="warning" @click="subCjqIp" :disabled="ipSub">提交</Button>
+          <Button type="info" @click="toggleIpBool ('cjq')">设置</Button>
+          <Button type="success" @click="subCjqIp" :disabled="ipSub">提交</Button>
         </div>
-        <div>
-          <Button type="warning" @click="deleteAll">表数据清空</Button>
+        <div class="item">
+          <Button type="error" @click="deleteAll">表数据清空</Button>
         </div>
-        <div>
-          <Button type="warning" @click="chongqi">重启数据采集器</Button>
+        <div class="item">
+          <Button type="primary" @click="chongqi">重启数据采集器</Button>
         </div>
-        <div>
+        <div class="item">
           <Button type="warning" @click="changePassword">修改密码</Button>
         </div>
         </Col>
@@ -66,17 +76,17 @@
         title="Title"
         v-model="changepsd"
         class-name="vertical-center-modal"
-        @on-ok="changeOk"
+        @on-ok="changepwdOk"
         @on-cancel="noChange">
         <Form :model="changepswd" label-position="right" :label-width="100">
           <FormItem label="旧密码:">
-            <Input type="password" v-model="changepswd.old"></Input>
+            <Input type="password" v-model="changepswd.oldPwd"></Input>
           </FormItem>
           <FormItem label="新密码:">
-            <Input type="password" v-model="changepswd.new"></Input>
+            <Input type="password" v-model="changepswd.newPwd"></Input>
           </FormItem>
           <FormItem label="再次输入新密码:">
-            <Input type="password" v-model="changepswd.checkNew"></Input>
+            <Input type="password" v-model="changepswd.checkNewPwd"></Input>
           </FormItem>
         </Form>
       </Modal>
@@ -97,9 +107,9 @@
         setMsg: [],
         CaiJiQiIp: '',
         changepswd: {
-          old: '',
-          new: '',
-          checkNew: ''
+          oldPwd: '',
+          newPwd: '',
+          checkNewPwd: ''
         }
       }
     },
@@ -226,16 +236,31 @@
         })
       },
       chongqi () {
-        this.$http.get('../cgi-bin/reboot.cgi').then((result) => {
-          console.log(result)
-        }).catch((err) => {
-          console.log(err)
+        this.$Modal.confirm({
+          title: '重启',
+          content: '<p>确定重启设备吗？</p>',
+          okText: '确定',
+          cancelText: '放弃',
+          onOk: () => {
+            this.$http.get('../cgi-bin/reboot.cgi').then((result) => {
+              if (result.data.result === 'true') {
+                this.$Message.success('重启成功')
+              } else {
+                this.$Message.error('重启失败')
+              }
+            }).catch((err) => {
+              console.log(err)
+            })
+          },
+          onCancel: () => {
+            this.$Message.info('放弃修改')
+          }
         })
       },
       changePassword () {
         this.changepsd = true
       },
-      changeOk () {
+      changepwdOk () {
         for (var i in this.changepswd) {
           if (this.changepswd[i] === '') {
             this.$Message.info({
@@ -248,15 +273,29 @@
             }, 10)
             return
           }
-          if (this.changepswd.new !== this.changepswd.checkNew) {
-            this.$Message.error('两次密码不一致')
-            setTimeout(() => {
-              this.changepsd = true
-            }, 10)
-            return
-          }
-          this.$http.get().then().catch()
         }
+        if (this.changepswd.newPwd !== this.changepswd.checkNewPwd) {
+          this.$Message.error('两次密码不一致')
+          setTimeout(() => {
+            this.changepsd = true
+          }, 10)
+          return
+        }
+        this.$http.get(`../cgi-bin/passwd_modify.cgi?${localStorage.getItem('uname')}&${this.changepswd.oldPwd}&${this.changepswd.newPwd}`).then((result) => {
+          console.log(result)
+          if (result.data.result === 'true') {
+            this.$Message.success('修改成功,请重新登录')
+            localStorage.removeItem('uname')
+            setTimeout(() => {
+              this.$router.push('/')
+            }, 1000)
+          }
+        }).catch((err) => {
+          console.log(err)
+        })
+      },
+      noChange () {
+        this.$Message.info('放弃修改')
       }
     }
   }
@@ -271,5 +310,8 @@
 
   .vertical-center-modal > .ivu-modal {
     top: 0;
+  }
+  .item {
+    margin : 10px auto 20px auto
   }
 </style>
