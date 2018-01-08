@@ -11,7 +11,7 @@
       v-model="modal"
       title="修改网口参数"
       @on-ok="TcpOk"
-      @on-cancel="TcpCancel">
+      @on-cancel="RtuCancel">
       <Form :model="selectTcp" label-position="right" :label-width="100">
         <FormItem label="标识:">
           <Input v-model="selectTcp.id" disabled></Input>
@@ -154,7 +154,7 @@
             key: 'name'
           },
           {
-            title: '主(M)从(S)模式',
+            title: '主从模式',
             key: 'model'
           },
           {
@@ -162,11 +162,11 @@
             key: 'type'
           },
           {
-            title: '串口(ser)/网口(eth)',
+            title: '串口/网口',
             key: 'tptype'
           },
           {
-            title: '是(1)否(0)使用',
+            title: '是否使用',
             key: 'enable'
           },
           {
@@ -437,21 +437,22 @@
         })
       },
       change (i) {
-        if (this.data1[i].type === 'MOD-TCP') {
+        console.log(this.data1[i].name.indexOf('TCP'), this.data1[i].name.indexOf('RTU'), this.data1[i].name.indexOf('ENS'))
+        if (this.data1[i].name.indexOf('TCP') !== -1) {
           this.$http.get(`../cgi-bin/modtcp_select.cgi?${this.data1[i].name}`).then((response) => {
             this.selectTcp = response.data
           }).catch((error) => {
             console.log(error)
           })
           this.modal = true
-        } else if (this.data1[i].type === 'MOD-RTU') {
+        } else if (this.data1[i].name.indexOf('RTU') !== -1) {
           this.$http.get(`../cgi-bin/modrtu_select.cgi?${this.data1[i].name}`).then((response) => {
             this.selectRtu = response.data
           }).catch((error) => {
             console.log(error)
           })
           this.modal1 = true
-        } else if (this.data1[i].type === 'SIEMENS') {
+        } else if (this.data1[i].name.indexOf('ENS') !== -1) {
           this.$http.get(`../cgi-bin/siemens_select.cgi?${this.data1[i].name}`).then((response) => {
             this.ensModal = true
             this.selectEns = response.data
