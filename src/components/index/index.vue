@@ -200,7 +200,7 @@
           </MenuItem>
         </Menu>
       </Sider>
-      <Layout style="">
+      <Layout style="min-height: 565px;">
         <Header :style="{padding: 0}" class="layout-header-bar">
           <Icon @click.native="collapsedSider" :class="rotateIcon" :style="{margin: '20px 20px 0'}" type="navicon-round"
                 size="24"></Icon>
